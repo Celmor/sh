@@ -1,0 +1,15 @@
+#!/bin/sh
+# file: "${HOME}"/bin/i3status
+# author: celmor
+# version: 2.2
+# date: 2016-10-16
+# idea: http://i3wm.org/i3status/manpage.html#_external_scripts_programs_with_i3status
+
+/usr/bin/i3status | while :
+do
+        read line
+        mystuff=$(awk '/MemFree/ {print int($2/1024)}' /proc/meminfo || exit 1 )
+        color=$( [ $mystuff -ge 10000 ] && echo '#00FF00' || ( [ $mystuff -le 3000 ] && echo '#FF0000' || echo '#FFFFF' ))
+        mystuff=$(printf "%'.3d\n" $mystuff)
+        echo $line | sed "s/tztime/1\",\"instance\":\"local,\",\"color\":\"$color\",\"markup\":\"none\",\"full_text\":\"Mem: $mystuff\"},{\"name\":\"/"
+done
