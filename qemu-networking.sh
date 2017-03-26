@@ -7,7 +7,7 @@ sudo iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 sudo iptables -A FORWARD -s 10.0.0.0/16 -i br0 -m conntrack --ctstate NEW -j ACCEPT
 sudo bash -c "iptables-save > /etc/iptables/iptables.rules"
  
-# setup (put this in/etc/libvirt/hooks/daemon if using libvirt or top of qemu start script):
+# setup (put this in /etc/libvirt/hooks/daemon if using libvirt or top of qemu start script):
 pidfile=qemu_setup.pid
 if [ ! -f "/tmp/$pidfile" ]; then
     ip link add name br0 type bridge
