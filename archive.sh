@@ -26,5 +26,5 @@
     || { printf "%s\n" "Error: output location doesn't exist (execute with no arguments to print usage)" >&2 && exit 3; }
 
 # main work
-tar -cJf "$output" -C "$(dirname "$input")" "$input" || exit
+tar -cJf "$output" -C "$(dirname "$input")" "$(basename "$input")" || exit
 rm -rdI "$input" || { printf "%s\n" "Error: Couldn't delete all files" >&2 && exit; }
