@@ -1,2 +1,2 @@
 # sh
-Various Bash-Scripts I use to make my life easier...
+Various Bash scripts I use, freely usable
