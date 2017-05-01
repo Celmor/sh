@@ -8,7 +8,6 @@
 #rename 000 if only it as just 1 part exists
 #use gpg's --passphrase-fd instead of file
 
-Var_fd='9'
 set -o pipefail
 #shopt -s extglob
 shopt -s nullglob;
@@ -95,7 +94,8 @@ pass=$(sudo mktemp /tmp/pass.XXX) && sudo chmod 600 "$pass"
 # 7z options:
 threads=10
 compressratio=9
-# GPG options: Var_fd='9'
+# GPG options
+Var_fd=9
 
 # archive phase
 if [ ! -v test ]; then
