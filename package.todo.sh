@@ -95,7 +95,7 @@ pass=$(sudo mktemp /tmp/pass.XXX) && sudo chmod 600 "$pass"
 threads=10
 compressratio=9
 # GPG options
-Var_fd=9
+gpg_fd=9
 
 # archive phase
 if [ ! -v test ]; then
@@ -119,7 +119,7 @@ _input() {
     | { {
         sleep 5s && ${distributeAffinity:-":"}; } &
         7z a -an -si -so -txz -m0=lzma2 -mmt="$threads" -mx="$compressratio" -mfb=64 -md=32m; } \
-    | sudo gpg2 -qc --passphrase-fd "$Var_fd" --no-permission-warning --cipher-algo AES256 --batch --passphrase-file "$pass" -z 0 \
+    | gpg2 -qc --passphrase-fd "$gpg_fd" --cipher-algo AES256 --batch -z 0 \
     | ${verbose:-"tee"} \
     | split -d -a 3 -t '\0' -b 999M - "$archive".xz. \
     && if [ -v notest ] || [ -v verbose ]; then echo "Archive created."; fi \
@@ -131,7 +131,7 @@ if [ ! -v notest ]; then
     gpg2 -qd "$archive".xz.gpg | tr -d '\n' | sudo tee "$pass" >/dev/null \
     && if [ -v test ] || [ -v verbose ]; then echo "Testing archive..."; fi \
     && cat "$archive".xz.[0-9][0-9][0-9] \
-    | sudo gpg2 -qd "$Var_fd" --no-permission-warning --batch --passphrase-file "$pass" \
+    | sudo gpg2 -qd "$gpg_fd" --no-permission-warning --batch --passphrase-file "$pass" \
     | 7z e -an -si -so -txz \
     | ${verbose:-"cat"} \
     | md5sum \
