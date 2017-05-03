@@ -3,15 +3,14 @@
 #version:   0.1.1
 #version:   0.1.2   accept stdin via '-' as 2nd arg
 #version:   0.1.2   allow specification of just 1 arg which let's it automatically read from stdin, restructuring of arg test and reading from input
+#version:   0.2     remove need of root elevation for password storage
 #todo:
 #further arguments as exceptions for dir
 #rename 000 if only it as just 1 part exists
-#use gpg's --passphrase-fd instead of file
 
 set -o pipefail
 #shopt -s extglob
 shopt -s nullglob;
-# gpg --passphrase-fd 0
 #trap '(read -p "[$BASH_SOURCE:$LINENO] $BASH_COMMAND?")' DEBUG
 
 _help(){
@@ -51,11 +50,11 @@ while getopts "vtq" opt; do
       verbose="pv -Warbrt"
       ;;
     t)
-      [ -v notest ] && echo "Error: -t -q can't be used together" >&2 && exit 1
+      [ -v notest ] && printf %s\\n "Error: -t -q can't be used together" >&2 && exit 1
       test="test"
       ;;
     q)
-      [ -v test ] && echo "Error: -t -q can't be used together" >&2 && exit 1
+      [ -v test ] && printf %s\\n "Error: -t -q can't be used together" >&2 && exit 1
       notest="notest"
       ;;
     d)
@@ -71,11 +70,6 @@ while getopts "vtq" opt; do
 done
 shift $((OPTIND-1))
 
-# preparation
-#taskset -p ff $$ >/dev/null
-#sudo -v || exit 1
-#sudo bash -c "sleep 1s; rm \"$pass\"" & pid=$!; kill -s SIGSTOP $pid
-
 # check arguments
 case $# in
     1) archive="$1" input=-
@@ -89,8 +83,7 @@ case $# in
     *) _help
        ;;
 esac
-user=$(whoami)
-pass=$(sudo mktemp /tmp/pass.XXX) && sudo chmod 600 "$pass"
+
 # 7z options:
 threads=10
 compressratio=9
@@ -101,10 +94,11 @@ gpg_fd=9
 if [ ! -v test ]; then
 
     # test archive doesn't already exists, then prepare
-    [ ! -f "$archive".md5 ] \
-    && openssl rand -base64 63 | tr -d '\n' | sudo tee "$pass" \
-    | gpg2 -qe --default-key "$user" > "$archive".xz.gpg || _help
-_input() {
+    [ ! -f "$archive.md5" ] \
+    && pass="$(openssl rand -base64 63)" \
+    && printf %s "$pass" | gpg2 -eqo "$archive.xz.gpg" \
+    || _help
+    _input() {
         # In case of failure either cat or tar will print sensible
         # diagnostic message and produce no output to stdout.
         # It is safe to rely on these diagnostics.
@@ -119,24 +113,22 @@ _input() {
     | { {
         sleep 5s && ${distributeAffinity:-":"}; } &
         7z a -an -si -so -txz -m0=lzma2 -mmt="$threads" -mx="$compressratio" -mfb=64 -md=32m; } \
-    | gpg2 -qc --passphrase-fd "$gpg_fd" --cipher-algo AES256 --batch -z 0 \
+    | gpg2 -qc --passphrase-fd "$gpg_fd" --cipher-algo AES256 --batch -z 0 9< <(printf %s "$pass") \
     | ${verbose:-"tee"} \
     | split -d -a 3 -t '\0' -b 999M - "$archive".xz. \
-    && if [ -v notest ] || [ -v verbose ]; then echo "Archive created."; fi \
-    || { echo "Error: failed creating the archive..." >&2; exit 1; }
+    && if [ -v notest ] || [ -v verbose ]; then printf %s\\n "Archive created."; fi \
+    || { printf %s\\n "Error: failed creating the archive..." >&2; exit 1; }
 fi
 if [ ! -v notest ]; then
-    [ -f "$archive".md5 ] || _help
-    sudo -v || exit 1
-    gpg2 -qd "$archive".xz.gpg | tr -d '\n' | sudo tee "$pass" >/dev/null \
-    && if [ -v test ] || [ -v verbose ]; then echo "Testing archive..."; fi \
+    [ -f "$archive.md5" ] || _help \
+    && if [ -v test ] || [ -v verbose ]; then printf %s\\n "Testing archive..."; fi \
+    && pass=$(gpg2 -qd "$archive.xz.gpg" | tr -d '\n') \
     && cat "$archive".xz.[0-9][0-9][0-9] \
-    | sudo gpg2 -qd "$gpg_fd" --no-permission-warning --batch --passphrase-file "$pass" \
+    | gpg2 -qd "$gpg_fd" --batch 9< <(printf %s "$pass") \
     | 7z e -an -si -so -txz \
     | ${verbose:-"cat"} \
     | md5sum \
     | { read md5; [[ "$md5" == "$(cat "$archive".md5 2>/dev/null)  -" ]] \
-    && if [ -v test ] || [ -v verbose ]; then echo "Archive verified!"; fi; } \
-    || { echo "Error: Verification failed (checksum doesn't match)" >&2; exit 1; }
+    && if [ -v test ] || [ -v verbose ]; then printf %s\\n "Archive verified!"; fi; } \
+    || { printf %s\\n "Error: Verification failed (checksum doesn't match)" >&2; exit 1; }
 fi
-[ -v test ] && echo "Deleting temporary pass-file..."; sudo rm "$pass" #kill -s SIGCONT $pid
