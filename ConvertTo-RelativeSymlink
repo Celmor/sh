@@ -1,7 +1,9 @@
 #!/bin/bash
-# verion: 1.0
-# Desc: Rewrite Symbolic Link with target to an absolate path
-#       to a target with relative path (i.e. relative symlink)
+# verion:    1.0
+# Desc:      Rewrite Symbolic Link with target to an absolate path
+#            to a target with relative path (i.e. relative symlink)
+# Parameter: 1 Smybolic link as first argument, further arguments ignored
+link="$1"
 
 # source of functions: http://paste.lisp.org/display/346076#1
 # by pjb on irc.freenode.net#bash
@@ -58,7 +60,6 @@ function repeat(){
     done
 }
 
-link="$1"
 # caching or relpath and unlinking required on some systems
 # (i.e. arch) as ln -f may be unable to overwrite symlink
 relpath="$(enoughNamestring "$(readlink "$link")" "$(dirname "$link")")"
