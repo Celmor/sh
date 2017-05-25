@@ -113,7 +113,7 @@ if [ ! -v test ]; then
     | { {
         sleep 5s && ${distributeAffinity:-":"}; } &
         7z a -an -si -so -txz -m0=lzma2 -mmt="$threads" -mx="$compressratio" -mfb=64 -md=32m; } \
-    | gpg2 -qc --passphrase-fd "$gpg_fd" --cipher-algo AES256 --batch -z 0 9< <(printf %s "$pass") \
+    | gpg2 -qc --passphrase-fd "$gpg_fd" --cipher-algo AES256 --batch -z 0 "$gpg_fd"< <(printf %s "$pass") \
     | ${verbose:-"tee"} \
     | split -d -a 3 -t '\0' -b 999M - "$archive".xz. \
     && if [ -v notest ] || [ -v verbose ]; then printf %s\\n "Archive created."; fi \
@@ -124,7 +124,7 @@ if [ ! -v notest ]; then
     && if [ -v test ] || [ -v verbose ]; then printf %s\\n "Testing archive..."; fi \
     && pass=$(gpg2 -qd "$archive.xz.gpg" | tr -d '\n') \
     && cat "$archive".xz.[0-9][0-9][0-9] \
-    | gpg2 -qd "$gpg_fd" --batch 9< <(printf %s "$pass") \
+    | gpg2 -qd "$gpg_fd" --batch "$gpg_fd"< <(printf %s "$pass") \
     | 7z e -an -si -so -txz \
     | ${verbose:-"cat"} \
     | md5sum \
