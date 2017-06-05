@@ -4,6 +4,8 @@
 # version: 2.2
 # date: 2016-10-16
 # idea: http://i3wm.org/i3status/manpage.html#_external_scripts_programs_with_i3status
+# depends on i3status
+# has to be i3 status_command
 
 /usr/bin/i3status | while :
 do
