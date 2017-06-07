@@ -1,5 +1,9 @@
 #!/bin/bash
-cd /Data/Download
+# Downloads Media with youtube-dl, expects h264 codec
+Defaultdir="/Data/Download"
+notification_daemon="twmnc"
+notification="$notification_daemon -t \"Download finished:\" -c \"$(youtube-dl --get-title $@)"\"
+cd "$Defaultdir" 2>/dev/null
 while getopts "d:" opt; do
   case $opt in
     d)
@@ -12,5 +16,5 @@ while getopts "d:" opt; do
 done
 shift $((OPTIND-1))
 
-youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' $@
-twmnc -t "Download finished:" -c "$(youtube-dl --get-title $@)"
+youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' $@ \
+&& $nofication
