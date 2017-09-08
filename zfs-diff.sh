@@ -1,8 +1,9 @@
 #!/bin/bash
 # calls zfs diff on filesystem with latest diff
 # mounts (readonly) if necessary
+[ $EUID == 0 ] || { echo "This script must be run as root"; exit 0; }
 for i in "$@"; do
-	snapshot="$(zfs list -t snapshot -o name -s creation -d 1 -r "$i" | tail -1)
+	snapshot="$(zfs list -t snapshot -o name -s creation -d 1 -r "$i" | tail -1)"
 	if [ "$snapshot" = "no datasets available" ]; then
 		printf '%s\n' "error: \"$i\" has no snapshots";
 	fi
@@ -16,7 +17,7 @@ for i in "$@"; do
 		fi
 		zfs set canmount=on "$i"
 	fi
-	zfs mount "$i" 2>&1 | grep -v already mounted >&2
+	zfs mount "$i" 2>&1 | grep -v "already mounted" >&2
 	zfs diff "$snapshot" "$i"
 	[ "$canmount" = "off" ] && zfs set canmount=off "$1" && \
 	[ "$readonly" = "no" ] && zfs set canmount=no "$1"
