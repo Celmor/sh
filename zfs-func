@@ -4,11 +4,9 @@
 pool=( Data DataBackup DataNew )
 # log file for stderror of zfs command
 log=/tmp/zfs.log
-# alias used so zfs wrapper function doesn't get called in scripts but only in terminal
-alias zfs=zfs_wrapper
 # zfs wrapper function so stderr of zfs command doesn't 'flood' terminal
 # for example if used wrong in which case stderr gets redirected to $log
-zfs_wrapper(){
+zfs(){
         sudo /usr/bin/zfs 2> >(
                 read -r && printf '%s\n' "$REPLY" >&2
                 read -r && [ ! -z "$REPLY" ] \
