@@ -7,7 +7,7 @@ log=/tmp/zfs.log
 # zfs wrapper function so stderr of zfs command doesn't 'flood' terminal
 # for example if used wrong in which case stderr gets redirected to $log
 zfs(){
-        sudo /usr/bin/zfs 2> >(
+        command zfs 2> >(
                 read -r && printf '%s\n' "$REPLY" >&2
                 read -r && [ ! -z "$REPLY" ] \
                 && printf 'more error output in "%s"\n' "$log" >&2 \
