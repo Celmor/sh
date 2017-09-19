@@ -42,3 +42,16 @@ syncPool(){
         sudo rsync -axHAXS -i --delete "$1/" /"$i${1//"/$root"}"/
         done
 }
+zfs-send(){
+        [ $EUID == 0 ] || { echo "This function must be run as root"; return 1; }
+	dataset="$1"
+        source="$2"
+        dest"$3"
+	snapshot1="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | head -1)"
+	attr=( compression mountpoint sharenfs exec setuid acltype xattr sharesmb )
+	parameter=()
+	for i in "${attr[@]}"; do value="$(zfs get -Ho value "$i" "$dataset")"; [ "$value" = "-" ] && continue; parameter+=("-o"); parameter+=("$i=$value"); done
+	zfs send -cL "$snapshot1" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
+	snapshot2="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | tail -1)"
+	zfs send -cLI "$snapshot1" "$snapshot2" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
+}
