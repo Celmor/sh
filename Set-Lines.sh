@@ -12,7 +12,7 @@ exiting(){
 trap "exiting" EXIT
 # read through file
 while read -r out; do
-	# if line I'm reading is lower than insert line copy line from intput into outpout
+	# if line I'm reading is lower than insert line copy line from intput into ]ut
 	if [[ $i -lt $line ]]; then
 		echo "$out" >> "$output"
 	else
