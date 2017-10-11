@@ -5,7 +5,7 @@ input="$1"
 line="$2"
 text="$3"
 i=0
-output="/tmp/$(mktemp "$input"XXX)"
+output="/tmp/$(mktemp "$(basename "$input")"XXX)"
 exiting(){
 	mv "$output" "$input"
 }
