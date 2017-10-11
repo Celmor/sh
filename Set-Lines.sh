@@ -1,5 +1,5 @@
 #!/bin/bash
-# inserts TEXT into FINE at LINE (overwriting lines)
+# inserts TEXT into FILE at LINE (overwriting lines)
 [ $# -ne 3 ] && printf '%s\n' "Usage: $0 \"FILE\" LINE \"TEXT\"" && exit 1
 input="$1"
 line="$2"
