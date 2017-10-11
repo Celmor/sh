@@ -1,8 +1,9 @@
 #!/bin/bash
-# inserts stdin into FINE at LINE (overwriting lines)
-[ $# -ne 2 ] && printf '%s\n' "Usage: $0 FILE LINE" && exit 1
+# inserts TEXT into FINE at LINE (overwriting lines)
+[ $# -ne 3 ] && printf '%s\n' "Usage: $0 \"FILE\" LINE \"TEXT\"" && exit 1
 input="$1"
 line="$2"
+text="$3"
 i=0
 output="/tmp/$(mktemp "$input"XXX)"
 exiting(){
@@ -15,7 +16,7 @@ while read -r out; do
 	if [[ $i -lt $line ]]; then
 		echo "$out" >> "$output"
 	else
-		tee >> "$output"
+		echo "$text" >> "$output"
 		exit
 	fi
 	((i++))
@@ -25,5 +26,4 @@ for ((; i<=line; i++)); do
 	#insert empty line
 	echo '' >> "$output"
 done
-tee >> "$output"
-
+echo "$text" >> "$output"
