@@ -20,7 +20,7 @@ while read -r out ; do
         output+="$text"'\n'
         # add remaining lines to buffer
 	output+="$out"'\n'
-done < <(printf '%s\n' "$file")
+done < <(cat -- "$file")
 # have read through file and filled buffer
 
 # now flush buffer to file
