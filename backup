@@ -1,0 +1,20 @@
+#!/bin/bash
+trap "exit" INT
+
+if [ "$#" != "1" ] || [ ! -s $1 ] ; then
+    echo "Usage: $0 Path-to-Backup" && exit 1
+fi
+
+path=$1
+echo "Generating password and protecting it"
+pass=`openssl rand -base64 32`
+echo $pass | gpg2 --encrypt > $path.pass.gpg # --trust-model always #--default-recipient-self
+echo "Creating archive (this process may take a while depending on the input data and your io/CPU speed)..."
+echo "Timestamp > $path.tar.xz.time" && date +d%F-%0H-%0M | tee $path.tar.xz.time
+tar Ohc $path | 7z a -an -si -so -txz -m0=lzma2 -mmt=on -mx=9 -mfb=64 -md=32m | gpg2 -c --cipher-algo AES256 --batch --passphrase=$pass -z 0 | pv -arbrt | \split -d -a 3 -t '\0' -b 999M - $path.tar.xz. && echo Created archive successfully && \
+echo "Generating Checksums (.sfv)" && \
+cksfv -b $path.tar.xz.{0,1,2,3,4,5,6,7,8,9}* > $path.tar.sfv 2> /dev/null && \
+echo "MD5sum of Tarred $path:"  && \
+tar Oc $path | md5sum | tee $path.tar.md5  && \
+echo "Testing archive (returned MD5sum should be equal)..."  && \
+cat $path.tar.xz.{0,1,2,3,4,5,6,7,8,9}* 2> /dev/null | gpg2 -d --batch --passphrase=$pass | 7z e -an -si -so -txz | pv -arbrt | md5sum
