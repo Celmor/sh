@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$#" -ne 3 ]; then
+	echo "Usage: $0 path dmask fmask"
+	exit 1
+fi
+find $1 -type d -exec chmod $2 {} \; && echo "dmask ($2) applied"
+find $1 -type f -exec chmod $3 {} \; && echo "fmask ($3) applied"
+exit 0
