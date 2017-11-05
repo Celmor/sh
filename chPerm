@@ -1,9 +1,11 @@
 #!/bin/bash
 
 if [ "$#" -ne 3 ]; then
-	echo "Usage: $0 path dmask fmask"
+	printf '%s\n' "Usage: $0 path dmask fmask"
 	exit 1
-fi
-find $1 -type d -exec chmod $2 {} \; && echo "dmask ($2) applied"
-find $1 -type f -exec chmod $3 {} \; && echo "fmask ($3) applied"
+[[ $2 =~ [0-7][0-7][0-7] ]] && [[ $3 =~ [0-7][0-7][0-7] ]] \
+|| { printf '%s\n' "Error: Invalid dmask/fmask" && exit 2; }
+cd -- "$1" || exit 3
+find . -depth -type d -exec chmod "$2" {} \+ && echo "dmask ($2) applied"
+find . -depth -type f -exec chmod "$3" {} \+ && echo "fmask ($3) applied"
 exit 0
