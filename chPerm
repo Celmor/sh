@@ -3,8 +3,10 @@
 if [ "$#" -ne 3 ]; then
 	printf '%s\n' "Usage: $0 path dmask fmask"
 	exit 1
-[[ $2 =~ [0-7][0-7][0-7] ]] && [[ $3 =~ [0-7][0-7][0-7] ]] \
-|| { printf '%s\n' "Error: Invalid dmask/fmask" && exit 2; }
+elsif [[ $2 != [0-7][0-7][0-7] ]] || [[ $3 != [0-7][0-7][0-7] ]]; then
+	printf '%s\n' "Error: Invalid dmask/fmask"
+	exit 2
+fi
 cd -- "$1" || exit 3
 find . -depth -type d -exec chmod "$2" {} \+ && echo "dmask ($2) applied"
 find . -depth -type f -exec chmod "$3" {} \+ && echo "fmask ($3) applied"
