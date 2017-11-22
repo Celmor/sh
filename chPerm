@@ -3,7 +3,7 @@
 if [ "$#" -ne 3 ]; then
 	printf '%s\n' "Usage: $0 path dmask fmask"
 	exit 1
-elsif [[ $2 != [0-7][0-7][0-7] ]] || [[ $3 != [0-7][0-7][0-7] ]]; then
+elif [[ $2 != [0-7][0-7][0-7] ]] || [[ $3 != [0-7][0-7][0-7] ]]; then
 	printf '%s\n' "Error: Invalid dmask/fmask"
 	exit 2
 fi
