@@ -1,0 +1,8 @@
+#!/bin/bash
+#to source
+call () 
+{ 
+    nohup "$@" > /dev/null 2> /dev/null &
+}
+mpv-watchLast(){ call mpv "$(sed /"redirect entry"/d ~/.config/mpv/watch_later/$(/usr/bin/ls -t ~/.config/mpv/watch_later/ | head -1) | head -1 | sed 's/# //')"; }
+mpv-watch_later () { ( cd ~/.config/mpv/watch_later/ && readarray -t watch_later < <(/usr/bin/ls -t) && for index in "${!watch_later[@]}"; do head -1 ./"${watch_later[index]}"; done | /usr/bin/grep ^# | sed 's/# //'); }
