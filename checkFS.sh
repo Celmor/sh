@@ -8,7 +8,7 @@ fi
 file="$(mktemp -tp "$fs" checkFS.XXX)"
 availM=$(($(df --sync -k --output=avail "$fs" | tail -1)/1024-1))
 if [ "$availM" -le 0 ]; then
-    printf "ERROR: Error: Not enough free space on %s\\n" "$fs"
+    printf "Error: Not enough free space on %s\\n" "$fs"
     exit -1
 fi
 
