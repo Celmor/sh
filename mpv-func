@@ -1,13 +1,10 @@
 #!/bin/bash
 #to source
-call () 
-{ 
-    nohup "$@" > /dev/null 2> /dev/null &
-}
-alias mpv="command mpv --sub-auto=all --sub-file-paths=\".:\${PWD}\""
+
+alias mpv='command mpv --sub-auto=all --sub-file-paths=".:${PWD}"'
 #todo: queue all
 queue-MPVWatchLater(){
-	call mpv "$(sed /"redirect entry"/d ~/.config/mpv/watch_later/$(/usr/bin/ls -t ~/.config/mpv/watch_later/ | head -1) | head -1 | sed 's/# //')"
+	mpv "$(sed /"redirect entry"/d ~/.config/mpv/watch_later/$(/usr/bin/ls -t ~/.config/mpv/watch_later/ | head -1) | head -1 | sed 's/# //')"
 }
 
 # lists saved sources from MPV
