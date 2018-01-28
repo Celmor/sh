@@ -54,7 +54,7 @@ zfs-send(){
 	parameter=()
 	for i in "${attr[@]}"; do value="$(zfs get -Ho value "$i" "$dataset")"; [ "$value" = "-" ] && continue; parameter+=("-o"); parameter+=("$i=$value"); done
 	zfs send -cL "$snapshot1" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
-	[ "$snapshot1" != "$snapshot2" ] && \
+	[ "$snapshot1" = "$snapshot2" ] || \
 	zfs send -cLI "$snapshot1" "$snapshot2" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
 }
 # destroys only dataset including all its snapshots, throws error if there are other children
