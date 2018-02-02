@@ -43,20 +43,33 @@ syncPool(){
         done
 }
 
+#to source
 zfs-send(){
-	[ $EUID == 0 ] || { echo "This function must be run as root"; return 1; }
 	dataset="$1"
-	source="$2"
-    dest"$3"
-	snapshot1="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | head -1)"
-	snapshot2="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | tail -1)"
+	snapshotFirst="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | head -1)"
+	snapshotLast="$(zfs list -Ho name -t snapshot -d 1 -r "$dataset" | tail -1)"
 	attr=( compression mountpoint sharenfs exec setuid acltype xattr sharesmb )
 	parameter=()
-	for i in "${attr[@]}"; do value="$(zfs get -Ho value "$i" "$dataset")"; [ "$value" = "-" ] && continue; parameter+=("-o"); parameter+=("$i=$value"); done
-	zfs send -cL "$snapshot1" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
-	[ "$snapshot1" = "$snapshot2" ] || \
-	zfs send -cLI "$snapshot1" "$snapshot2" | zfs recv -uv "${parameter[@]}" "$(i="${dataset//"$source"/"$dest"}"; echo "${i%@*}")"
+	for i in "${attr[@]}"; do
+		value="$(zfs get -Ho value "$i" "$dataset")"
+		[ "$value" = "-" ] && continue
+		parameter+=("-o")
+		parameter+=("$i=$value")
+	done
+	zfs send -cL "$snapshotFirst" \
+		| zfs recv -Fsuv "${parameter[@]}" "$(
+			i="${dataset//DataBackup/DataNew}"
+			echo "${i%@*}"
+		)"
+	if [ "$snapshotFirst" != "$snapshotLast" ]; then
+	zfs send -cLI "$snapshotFirst" "$snapshotLast" \
+		| zfs recv -Fsuv "${parameter[@]}" "$(
+			i="${dataset//DataBackup/DataNew}"
+			echo "${i%@*}"
+		)"
+	fi
 }
+
 # destroys only dataset including all its snapshots, throws error if there are other children
 zfs-destroy(){
 	zfs list -Ht snapshot -o name -d 1 -r "$1" | while read -r snapshot; do zfs destroy "$snapshot"; done && zfs destroy "$1"
