@@ -53,7 +53,7 @@ for encfs in ~/{secure,new/bill,Downloads/jdownloader}; do
         continue
     else
         printf "mount: opening: %s...\\n" "$encfs" >&2
-               if encfs "$(dirname "$encfs")"/."$(basename "$encfs")" "$encfs"; then
+        if encfs "$(dirname "$encfs")"/."$(basename "$encfs")" "$encfs"; then
             printf "mount: opened: %s...\\n" "$encfs" >&2
         else
             printf "mount: open failed: %s...\\n" "$encfs" >&2
