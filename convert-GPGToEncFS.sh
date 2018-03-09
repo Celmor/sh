@@ -6,9 +6,9 @@ Suffix="${4:-.gpg}"
 
 set -e
 cd "$Source" || exit 1
-read -rs pass
+read -rsp "Type passphrase for gpg private key" pass
 for file in *"$Suffix"; do
-    temp="$(mktemp "${file//.gpg/}.XXX")"
+    temp="/tmp/$(mktemp "${file//.gpg/}.XXX")"
     if gpg2 --batch --yes --pinentry-mode loopback --passphrase "$pass" -o "$temp" -qd "$file"; then
         cp -a --attributes-only "$file" "$temp"
         sudo -u "$User" cp -ai "$temp" "$Target/${file//.gpg/}"
