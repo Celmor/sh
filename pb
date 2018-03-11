@@ -10,6 +10,8 @@ elif [ "$1" = "-d" ]; then
 	paste="$(ls -t /tmp/paste* | head -1)"
 	uuid="$(grep uuid: "$paste" | awk '{ print $2 }')" || exit 1
 	curl -X DELETE "$url"/"$uuid" > "$paste"
+	notify-send "Last paste deleted"
 	exit
 fi
 xclip -o | curl -F c=@- "$url" | tee "$(mktemp /tmp/paste.XXX)" | awk '/url:/ { print $2 }' | xclip -sel clip || exit 1
+notify-send "Paste uploaded and URL copied to clipboard"
