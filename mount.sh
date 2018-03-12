@@ -62,7 +62,7 @@ mount-Zpool "zpool-docker" "/var/lib/docker" "/docker" "docker"
 
 trap : INT
 for encfs in ~/{secure,new/bill,Downloads/jdownloader}; do
-    if mountpoint -q ~/"$encfs"; then
+    if mountpoint -q "$encfs"; then
         printf "mount: already mounted: %s\\n" "$encfs" >&2
         continue
     else
