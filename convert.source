@@ -1,0 +1,7 @@
+#resources
+#https://unix.stackexchange.com/questions/273624/case-insensitive-search-in-awk#273625
+#https://stackoverflow.com/questions/16623835/remove-a-fixed-prefix-suffix-from-a-string-in-bash#16623897
+function convert-DesktopToUrl {
+	printf "[InternetShortcut]\nIDList=\n" > "${1%.desktop}.url"
+	awk 'BEGIN{IGNORECASE=1} awk -F = '/url/ {$1=""; print $0}' "$1" | tr -d '[$e]' >> "${1%.desktop}.url"
+}
