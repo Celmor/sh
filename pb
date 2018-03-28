@@ -13,5 +13,5 @@ elif [ "$1" = "-d" ]; then
 	notify-send "Last paste deleted"
 	exit
 fi
-xclip -o | curl -F c=@- "$url" | tee "$(mktemp /tmp/paste.XXX)" | awk '/url:/ { print $2 }' | xclip -sel clip || exit 1
+xclip -o | curl -F c=@- "$url" | tee "$(mktemp /tmp/paste.XXX)" | awk '/url:/ { print $2 }' | tr -d '\n' | xclip -sel clip || exit 1
 notify-send "Paste uploaded and URL copied to clipboard"
