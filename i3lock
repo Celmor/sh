@@ -1,0 +1,11 @@
+#!/bin/bash
+revert() {
+	exec setxkbmap -option terminate:ctrl_alt_bks -option grp:alt_caps_toggle
+	xset dpms 0 0 0
+}
+trap revert SIGHUP SIGINT SIGTERM
+setxkbmap -option
+xset +dpms dpms 5 5 5
+for i in /dev/disk/by-id/ata-HGST_HDN724040ALE640_??????????????; do sudo hdparm -y $i & done
+/usr/bin/i3lock -ni <(import -silent -window root png:- | mogrify -blur 0x40 png:-)
+revert
