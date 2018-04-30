@@ -1,6 +1,6 @@
 #!/bin/bash
 revert() {
-	exec setxkbmap -option terminate:ctrl_alt_bks -option grp:alt_caps_toggle
+	setxkbmap -option terminate:ctrl_alt_bks -option grp:alt_caps_toggle
 	xset dpms 0 0 0
 }
 trap revert SIGHUP SIGINT SIGTERM
