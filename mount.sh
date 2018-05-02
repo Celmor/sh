@@ -58,11 +58,10 @@ function mount-Zpool {
     sudo systemctl start "$service"
   fi
 }
-mount-Zpool "DataRecover" "/DataRecover" "/dev/disk/by-id/usb-WD_My_Book_25EE_575838314436354153553250-0:0-part2" "nfs-server"
-mount-Zpool "zpool-docker" "/var/lib/docker" "/docker" "docker"
+mount-Zpool "DataRecover" "/DataRecover" "/dev/disk/by-id/ata-HGST_HDN724040ALE640_PK1338P4HVX34B" "docker"
 
 trap : INT
-for encfs in ~/{secure,new/bill,Downloads/jdownloader}; do
+for encfs in ~/{secure,new/bill}; do
   if
     mountpoint -q "$encfs"; then
     printf "mount: already mounted: %s\\n" "$encfs" >&2
