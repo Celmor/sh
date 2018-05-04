@@ -9,7 +9,8 @@ if [ "$1" = "-h" ]; then
 elif [ "$1" = "-d" ]; then
 	paste="$(ls -t /tmp/paste* | head -1)"
 	uuid="$(grep uuid: "$paste" | awk '{ print $2 }')" || exit 1
-	curl -X DELETE "$url"/"$uuid" > "$paste"
+	curl -X DELETE "$url"/"$uuid"
+	rm "$paste"
 	notify-send "Last paste deleted"
 	exit
 fi
