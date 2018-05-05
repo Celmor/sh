@@ -4,7 +4,8 @@ set -e
 [ $# -gt 0 ] && echo "usage $0" && exit 1
 
 for flash in "/dev/disk/by-id/usb-Samsung_Type-C_0374917020008616-0:0-part1" \
-             "/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_D850E64D1AD1BEC069BD0D36-0:0-part1"; do
+             "/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_D850E64D1AD1BEC069BD0D36-0:0-part1" \
+	     "/dev/disk/by-id/usb-Nitrokey_Nitrokey_Storage_0000000000000-0:0-part1"; do
   printf "Trying to mount: %s...\\n" "$(basename "$flash")" >&2
   if
     mountpoint -q /media/flash; then
