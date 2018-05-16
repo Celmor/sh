@@ -1,6 +1,9 @@
 #!/bin/bash
 # deduplicate files in current path by searching for files with matching checksums (md5) and hardlinking them
 
+if [ $# -ne 0 ]; then
+    printf 'USAGE: %s' "$0"
+fi
 declare -A hashtable
 while read -r line; do
     hash="${line%% *}"
