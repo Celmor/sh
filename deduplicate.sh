@@ -1,9 +1,9 @@
 #!/bin/bash
 # deduplicate files in current path by searching for files with matching checksums (md5) and hardlinking them
+# WARNING: cannot handle file names with new lines
 
-if [ $# -ne 0 ]; then
-    printf 'USAGE: %s' "$0"
-fi
+[ $# -eq 1 ] && [ "$1" = "-i" ] && interactive="true" || [ $# -eq 0 ] || \
+    printf 'USAGE: %s [-i]' "$0"
 declare -A hashtable
 while read -r line; do
     hash="${line%% *}"
@@ -15,6 +15,7 @@ while read -r line; do
         hashtable["$hash"]=${line#*  }
     # collision
     else
-        ln -f "${hashtable["$hash"]}" "${line#*  }"
+        printf 'linking: '\''%s'\''\n' "${hashtable["$hash"]}"
+        ln -f ${interactive:+"-i"} "${hashtable["$hash"]}" "${line#*  }"
     fi
 done < <(find . -type f -exec md5sum {} +)
